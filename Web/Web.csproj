@@ -4,4 +4,9 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="OpenIddict" Version="3.0.3" />
+      <PackageReference Include="OpenIddict.AspNetCore" Version="3.0.3" />
+    </ItemGroup>
+
 </Project>
