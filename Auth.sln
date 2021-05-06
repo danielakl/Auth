@@ -2,6 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth", "Auth\Auth.csproj", "{26BAEA0C-8DB5-4F68-B062-8478A0376AE1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{FE1061B1-FD99-4869-97E5-A57C800B896D}"
+ProjectSection(SolutionItems) = preProject
+	.dockerignore = .dockerignore
+	.editorconfig = .editorconfig
+	.gitattributes = .gitattributes
+	nuget.config = nuget.config
+	stylecop.json = stylecop.json
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

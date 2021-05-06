@@ -1,0 +1,112 @@
+###############################
+# Git Line Endings            #
+###############################
+# Based on gitattributes-best-practices
+# https://rehansaeed.com/gitattributes-best-practices/
+
+# Set default behaviour to automatically normalize line endings.
+*	text=auto
+
+# On linux or mac you can run the following command to print all the different
+# file endings in your current directory.
+# find . -type f -not \( -o -path "*/dist/*" -o -path "*/bin/*" -o -path "*/obj/*" \) | perl -ne 'print $1 if m/\.([^.\/]+)$/' | sort -u
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+
+# Git
+*.gitignore		text
+*.gitattributes	text
+*.gitmodules    text
+
+# C#
+*.cs            text diff=csharp
+*.sln           text eol=crlf
+*.DotSettings   text
+*.csproj        text
+*.props         text
+*.targets       text
+*.ruleset       text
+
+# SQL
+*.sql           text
+*.sqlgen        text
+*.sqlproj       text
+*.dtsx          text
+
+# Docker
+*Dockerfile     text
+*.dockerignore  text
+*.dcproj        text
+*.env           text
+
+# Web
+*.ts            text
+*.js            text
+*.html          text diff=html
+*.vue           text
+*.css           text diff=css
+*.sass          text
+*.scss          text
+*.map           text
+*.har           text
+*.lock          text
+
+# Data structures
+*.yml           text
+*.yaml          text
+*.json          text
+*.xml           text
+*.conf          text
+*.config        text
+*.txt           text
+*.resx          text
+
+# Tests
+*.runsettings   text
+
+# Documentation
+*.md           text diff=markdown
+*.graphml      text
+
+# Certificate
+*.crt           text
+*.csr           text
+*.key           text
+*.pem           text
+
+# Windows files
+*.ps1   text eol=crlf
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+
+# Linux files
+*.sh    text eol=lf
+*.bash  text eol=lf
+
+# Other
+*.editorconfig  text
+
+# Git Large File System (LFS) #
+# Archives
+*.7z        binary filter=lfs diff=lfs merge=lfs
+*.br        binary filter=lfs diff=lfs merge=lfs
+*.gz        binary filter=lfs diff=lfs merge=lfs
+*.tar       binary filter=lfs diff=lfs merge=lfs
+*.zip       binary filter=lfs diff=lfs merge=lfs
+
+# Images
+*.jpg       binary filter=lfs diff=lfs merge=lfs
+*.png       binary filter=lfs diff=lfs merge=lfs
+*.svg       binary filter=lfs diff=lfs merge=lfs
+*.ico       binary filter=lfs diff=lfs merge=lfs
+
+# Fonts
+*.woff      binary filter=lfs diff=lfs merge=lfs
+*.woff2     binary filter=lfs diff=lfs merge=lfs
+*.ttf       binary filter=lfs diff=lfs merge=lfs
+
+# Documents
+*.docx      binary filter=lfs diff=lfs merge=lfs
+*.pdf       binary filter=lfs diff=lfs merge=lfs
+*.pfx       binary filter=lfs diff=lfs merge=lfs
