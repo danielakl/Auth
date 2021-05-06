@@ -9,6 +9,7 @@ ProjectSection(SolutionItems) = preProject
 	.gitattributes = .gitattributes
 	nuget.config = nuget.config
 	stylecop.json = stylecop.json
+	docker-compose.yml = docker-compose.yml
 EndProjectSection
 EndProject
 Global

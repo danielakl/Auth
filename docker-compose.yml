@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  auth:
+    image: auth:dev
+    build:
+      context: .
+      dockerfile: ./Auth/Dockerfile
+    container_name: auth
+    depends_on:
+      - auth-db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DbOptions__ConnectionString=Server=tcp:auth-db,1433;Database=auth;User ID=sa;Password=tlfrpQe5jw1VAG8Y;Trusted_Connection=False;Encrypt=False;
+      - DbOptions__MigrateDb=true
+      - DbOptions__SeedDb=true
+    ports:
+      - 6000:80
+      - 6001:443
+
+  auth-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: auth-db
+    restart: always
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=tlfrpQe5jw1VAG8Y
+    ports:
+    - 1433:1433
