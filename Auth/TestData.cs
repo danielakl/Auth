@@ -1,25 +1,25 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using OpenIddict.Abstractions;
-
 namespace Auth
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using OpenIddict.Abstractions;
+
     public class TestData : IHostedService
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         public TestData(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            this.serviceProvider = serviceProvider;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = serviceProvider.CreateScope();
 
             var context = scope.ServiceProvider.GetRequiredService<DbContext>();
             await context.Database.EnsureCreatedAsync(cancellationToken);
@@ -38,7 +38,8 @@ namespace Auth
             var postmanApplication = await openIdAppManager.FindByClientIdAsync(clientId, cancellationToken);
             if (postmanApplication is null)
             {
-                await openIdAppManager.CreateAsync(new OpenIddictApplicationDescriptor
+                await openIdAppManager.CreateAsync(
+                    new OpenIddictApplicationDescriptor
                 {
                     ClientId = clientId,
                     ClientSecret = "postman-secret",
@@ -55,8 +56,8 @@ namespace Auth
 
                         OpenIddictConstants.Permissions.Prefixes.Scope + "api",
 
-                        OpenIddictConstants.Permissions.ResponseTypes.Code
-                    }
+                        OpenIddictConstants.Permissions.ResponseTypes.Code,
+                    },
                 }, cancellationToken);
             }
         }

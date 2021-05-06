@@ -1,17 +1,17 @@
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Abstractions;
-using OpenIddict.Server.AspNetCore;
-
 namespace Auth.Controllers.Api
 {
+    using System;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using OpenIddict.Abstractions;
+    using OpenIddict.Server.AspNetCore;
+
     [ApiController]
     [Route("api/connect")]
     public class OpenIdConnectController : ControllerBase
@@ -21,21 +21,21 @@ namespace Auth.Controllers.Api
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Authorize()
         {
-            var openIdRequest = HttpContext.GetOpenIddictServerRequest() ??
+            var openIdRequest = this.HttpContext.GetOpenIddictServerRequest() ??
                                 throw new InvalidOperationException("OpenId Connect request cannot be retrieved");
 
             // Retrieve the user principal stored in the authentication cookie.
-            var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var authResult = await this.HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             // If the user principal can't be extracted, redirect the user to the login page.
             if (!authResult.Succeeded)
             {
-                return Challenge(
+                return this.Challenge(
                     authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
                     properties: new AuthenticationProperties
                     {
                         RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                            Request.HasFormContentType ? Request.Form : Request.Query)
+                            Request.HasFormContentType ? Request.Form : Request.Query),
                     });
             }
 
@@ -51,7 +51,7 @@ namespace Auth.Controllers.Api
                 // Add Identity Claims
                 new Claim(OpenIddictConstants.Claims.Name, "some").SetDestinations(OpenIddictConstants.Destinations.IdentityToken),
                 new Claim(OpenIddictConstants.Claims.Username, "someusername").SetDestinations(OpenIddictConstants.Destinations.IdentityToken),
-                new Claim(OpenIddictConstants.Claims.Email, "some@email.com").SetDestinations(OpenIddictConstants.Destinations.IdentityToken)
+                new Claim(OpenIddictConstants.Claims.Email, "some@email.com").SetDestinations(OpenIddictConstants.Destinations.IdentityToken),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -70,16 +70,16 @@ namespace Auth.Controllers.Api
         {
             var openIdRequest = HttpContext.GetOpenIddictServerRequest() ??
                                 throw new InvalidOperationException("OpenID Connect request cannot be retrieved");
-            
+
             ClaimsPrincipal claimsPrincipal;
 
             if (openIdRequest.IsClientCredentialsGrantType())
             {
                 // Note: the client credentials are automatically validated by OpenIddict:
                 // if client_id or client_secret are invalid, this action won't be invoked.
-                
+
                 var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-                
+
                 // Subject (sub) is a required field, we use the client id as the subject identifier here.
                 identity.AddClaim(OpenIddictConstants.Claims.Subject, openIdRequest.ClientId!);
 
@@ -93,14 +93,14 @@ namespace Auth.Controllers.Api
             else if (openIdRequest.IsAuthorizationCodeGrantType())
             {
                 // Retrieve the claims principal stored in the authorization code
-                var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                var authResult = await this.HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
                 claimsPrincipal = authResult.Principal;
             }
             else if (openIdRequest.IsRefreshTokenGrantType())
             {
                 // Retrieve the claims principal stored in the refresh token.
-                var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                var authResult = await this.HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
                 claimsPrincipal = authResult.Principal;
             }
@@ -110,21 +110,21 @@ namespace Auth.Controllers.Api
             }
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
-            return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return this.SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
         [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
         [HttpGet("userinfo")]
         public async Task<IActionResult> UserInfo()
         {
-            var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var authResult = await this.HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             var claimsPrincipal = authResult.Principal;
 
             return Ok(new
             {
                 Name = claimsPrincipal!.GetClaim(OpenIddictConstants.Claims.Subject),
                 Occupation = "Developer",
-                Age = 43
+                Age = 43,
             });
         }
     }

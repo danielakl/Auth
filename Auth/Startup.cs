@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-
 namespace Auth
 {
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.OpenApi.Models;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -23,7 +23,7 @@ namespace Auth
         {
             services.AddControllersWithViews();
 
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Api", Version = "v1"}); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" }); });
 
             services.AddDbContext<DbContext>(opts =>
             {
@@ -32,11 +32,13 @@ namespace Auth
             });
 
             services.AddOpenIddict()
+
                 // Register OpenIddict core components
                 .AddCore(opts =>
                 {
                     opts.UseEntityFrameworkCore().UseDbContext<DbContext>();
                 })
+
                 // Register OpenIddict server components
                 .AddServer(opts =>
                 {
@@ -52,6 +54,7 @@ namespace Auth
                     // TODO: Ephemeral Keys are discarded on application shutdown
                     opts.AddEphemeralEncryptionKey()
                         .AddEphemeralSigningKey();
+
                     // Token is encrypted by default
                     //    .DisableAccessTokenEncryption();
 
@@ -86,6 +89,7 @@ namespace Auth
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
