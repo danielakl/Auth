@@ -44,7 +44,8 @@ namespace Auth
                     opts.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
 
                     opts.SetAuthorizationEndpointUris("/api/connect/authorize")
-                        .SetTokenEndpointUris("/api/connect/token");
+                        .SetTokenEndpointUris("/api/connect/token")
+                        .SetUserinfoEndpointUris("/api/connect/userinfo");
 
                     // Encryption and signing of tokens
                     // TODO: Ephemeral Keys are discarded on application shutdown
@@ -59,7 +60,8 @@ namespace Auth
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
                     opts.UseAspNetCore()
                         .EnableAuthorizationEndpointPassthrough()
-                        .EnableTokenEndpointPassthrough();
+                        .EnableTokenEndpointPassthrough()
+                        .EnableUserinfoEndpointPassthrough();
                 });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

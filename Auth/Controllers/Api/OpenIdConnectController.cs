@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
@@ -43,7 +44,14 @@ namespace Auth.Controllers.Api
             {
                 // 'subject' claim which is required
                 new Claim(OpenIddictConstants.Claims.Subject, authResult.Principal!.Identity!.Name!),
-                new Claim("some claim", "some value").SetDestinations(OpenIddictConstants.Destinations.AccessToken)
+
+                // Add Access Claims
+                new Claim("some claim", "some value").SetDestinations(OpenIddictConstants.Destinations.AccessToken),
+
+                // Add Identity Claims
+                new Claim(OpenIddictConstants.Claims.Name, "some").SetDestinations(OpenIddictConstants.Destinations.IdentityToken),
+                new Claim(OpenIddictConstants.Claims.Username, "someusername").SetDestinations(OpenIddictConstants.Destinations.IdentityToken),
+                new Claim(OpenIddictConstants.Claims.Email, "some@email.com").SetDestinations(OpenIddictConstants.Destinations.IdentityToken)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -96,6 +104,21 @@ namespace Auth.Controllers.Api
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
+
+        [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
+        [HttpGet("userinfo")]
+        public async Task<IActionResult> UserInfo()
+        {
+            var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var claimsPrincipal = authResult.Principal;
+
+            return Ok(new
+            {
+                Name = claimsPrincipal!.GetClaim(OpenIddictConstants.Claims.Subject),
+                Occupation = "Developer",
+                Age = 43
+            });
         }
     }
 }
