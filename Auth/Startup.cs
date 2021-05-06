@@ -1,5 +1,6 @@
 namespace Auth
 {
+    using Auth.Options;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -21,13 +22,23 @@ namespace Auth
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(this.Configuration.GetSection(AuthDbOptions.ConfigKey).Get<AuthDbOptions>());
+
             services.AddControllersWithViews();
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" }); });
 
-            services.AddDbContext<DbContext>(opts =>
+            services.AddDbContext<DbContext>((sp, opts) =>
             {
-                opts.UseInMemoryDatabase(nameof(DbContext));
+                var dbOptions = sp.GetRequiredService<AuthDbOptions>();
+                opts.EnableDetailedErrors(dbOptions.EnableDetailedErrors)
+                    .EnableSensitiveDataLogging(dbOptions.EnableSensitiveDataLogging)
+                    .UseSqlServer(dbOptions.ConnectionString, builder =>
+                    {
+                        builder.EnableRetryOnFailure(7);
+                        builder.MigrationsHistoryTable("migration_history", "authapi");
+                    });
+
                 opts.UseOpenIddict();
             });
 
