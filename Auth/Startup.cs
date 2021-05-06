@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
-namespace Api
+namespace Auth
 {
     public class Startup
     {
@@ -28,7 +21,8 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllersWithViews();
+
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Api", Version = "v1"}); });
 
             services.AddDbContext<DbContext>(opts =>
@@ -47,8 +41,11 @@ namespace Api
                 .AddServer(opts =>
                 {
                     opts.AllowClientCredentialsFlow();
-                    opts.SetTokenEndpointUris("/connect/token");
-                    
+                    opts.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
+
+                    opts.SetAuthorizationEndpointUris("/api/connect/authorize")
+                        .SetTokenEndpointUris("/api/connect/token");
+
                     // Encryption and signing of tokens
                     // TODO: Ephemeral Keys are discarded on application shutdown
                     opts.AddEphemeralEncryptionKey()
@@ -60,7 +57,15 @@ namespace Api
                     opts.RegisterScopes("api");
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    opts.UseAspNetCore().EnableTokenEndpointPassthrough();
+                    opts.UseAspNetCore()
+                        .EnableAuthorizationEndpointPassthrough()
+                        .EnableTokenEndpointPassthrough();
+                });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opts =>
+                {
+                    opts.LoginPath = "/account/login";
                 });
 
             services.AddHostedService<TestData>();
@@ -75,15 +80,25 @@ namespace Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1"));
             }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+            });
         }
     }
 }

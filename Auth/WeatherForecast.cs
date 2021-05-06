@@ -1,6 +1,6 @@
 using System;
 
-namespace Api
+namespace Auth
 {
     public class WeatherForecast
     {

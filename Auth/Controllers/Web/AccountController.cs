@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Models;
+using Auth.Models;
 
-namespace Web.Controllers
+namespace Auth.Controllers.Web
 {
     public class AccountController : Controller
     {

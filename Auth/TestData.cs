@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
 
-namespace Api
+namespace Auth
 {
     public class TestData : IHostedService
     {
@@ -26,25 +26,38 @@ namespace Api
 
             var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
-            var postmanApplication = await manager.FindByClientIdAsync("postman", cancellationToken);
+            await SeedPostmanClient(manager, cancellationToken);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken) => await Task.CompletedTask;
+
+        private static async Task SeedPostmanClient(IOpenIddictApplicationManager openIdAppManager, CancellationToken cancellationToken)
+        {
+            const string clientId = "postman";
+
+            var postmanApplication = await openIdAppManager.FindByClientIdAsync(clientId, cancellationToken);
             if (postmanApplication is null)
             {
-                await manager.CreateAsync(new OpenIddictApplicationDescriptor
+                await openIdAppManager.CreateAsync(new OpenIddictApplicationDescriptor
                 {
-                    ClientId = "postman",
+                    ClientId = clientId,
                     ClientSecret = "postman-secret",
                     DisplayName = "Postman",
+                    RedirectUris = { new Uri("https://oauth.pstmn.io/v1/callback") },
                     Permissions =
                     {
+                        OpenIddictConstants.Permissions.Endpoints.Authorization,
                         OpenIddictConstants.Permissions.Endpoints.Token,
+
+                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.GrantTypes.ClientCredentials,
-                        
-                        OpenIddictConstants.Permissions.Prefixes.Scope + "api"
+
+                        OpenIddictConstants.Permissions.Prefixes.Scope + "api",
+
+                        OpenIddictConstants.Permissions.ResponseTypes.Code
                     }
                 }, cancellationToken);
             }
         }
-
-        public async Task StopAsync(CancellationToken cancellationToken) => await Task.CompletedTask;
     }
 }
