@@ -14,7 +14,7 @@ namespace Auth.Controllers.Api
 {
     [ApiController]
     [Route("api/connect")]
-    public class AuthorizationController : ControllerBase
+    public class OpenIdConnectController : ControllerBase
     {
         [HttpGet("authorize")]
         [HttpPost("authorize")]
