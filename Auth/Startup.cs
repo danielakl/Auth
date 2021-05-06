@@ -42,6 +42,7 @@ namespace Auth
                 {
                     opts.AllowClientCredentialsFlow();
                     opts.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
+                    opts.AllowRefreshTokenFlow();
 
                     opts.SetAuthorizationEndpointUris("/api/connect/authorize")
                         .SetTokenEndpointUris("/api/connect/token")

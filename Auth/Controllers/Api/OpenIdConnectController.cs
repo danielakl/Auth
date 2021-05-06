@@ -97,6 +97,13 @@ namespace Auth.Controllers.Api
 
                 claimsPrincipal = authResult.Principal;
             }
+            else if (openIdRequest.IsRefreshTokenGrantType())
+            {
+                // Retrieve the claims principal stored in the refresh token.
+                var authResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+                claimsPrincipal = authResult.Principal;
+            }
             else
             {
                 throw new InvalidOperationException("Specified grant type is not supported.");
