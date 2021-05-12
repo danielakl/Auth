@@ -1,6 +1,7 @@
 namespace Auth
 {
-    using Auth.Options;
+    using Auth.Database;
+    using Auth.Extensions;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,10 @@ namespace Auth
 
     public class Startup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// </summary>
+        /// <param name="configuration">Configuration.</param>
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
@@ -19,16 +24,15 @@ namespace Auth
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(this.Configuration.GetSection(AuthDbOptions.ConfigKey).Get<AuthDbOptions>());
+            services.AddSingleton(this.Configuration.GetSection<AuthDbOptions>(AuthDbOptions.ConfigKey));
 
             services.AddControllersWithViews();
 
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" }); });
+            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" }));
 
-            services.AddDbContext<DbContext>((sp, opts) =>
+            services.AddDbContext<AuthContext>((sp, opts) =>
             {
                 var dbOptions = sp.GetRequiredService<AuthDbOptions>();
                 opts.EnableDetailedErrors(dbOptions.EnableDetailedErrors)
@@ -45,10 +49,7 @@ namespace Auth
             services.AddOpenIddict()
 
                 // Register OpenIddict core components
-                .AddCore(opts =>
-                {
-                    opts.UseEntityFrameworkCore().UseDbContext<DbContext>();
-                })
+                .AddCore(opts => opts.UseEntityFrameworkCore().UseDbContext<AuthContext>())
 
                 // Register OpenIddict server components
                 .AddServer(opts =>

@@ -1,6 +1,6 @@
-namespace Auth.Options
+namespace Auth.Database
 {
-    public class AuthDbOptions
+    public record AuthDbOptions
     {
         public const string ConfigKey = "AuthDbOptions";
 
